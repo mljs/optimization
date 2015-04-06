@@ -1,5 +1,8 @@
+'use strict';
+
 require("../src/optimization");
 require("../src/util");
+require("../src/differentialEquations")
 var math = require('mathjs');
 
 describe('Optimization', function () {
@@ -44,4 +47,15 @@ describe('Optimization', function () {
         (result.eval).should.be.approximately(-6.99999998, 10e-2);
 
     });
+});
+
+describe('Differential Equations', function() {
+
+    // Test case obtaines from Pag 502, chap 9.
+    it('Runge-Kutta order 4', function() {
+        var f = math.eval("f(t, y) = divide(subtract(t, y), 2)");
+        var result = DifferentialEquations.rungeKuttaOrder4(f, 0, 3, 1, 15);
+        (math.subset(result.Y, math.index(15))).should.be.approximately(1.6693905, 10e-4);
+    });
+
 });
