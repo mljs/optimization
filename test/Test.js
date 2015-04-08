@@ -54,8 +54,15 @@ describe('Differential Equations', function() {
     // Test case obtaines from Pag 502, chap 9.
     it('Runge-Kutta order 4', function() {
         var f = math.eval("f(t, y) = divide(subtract(t, y), 2)");
-        var result = DifferentialEquations.rungeKuttaOrder4(f, 0, 3, 1, 15);
-        (math.subset(result.Y, math.index(15))).should.be.approximately(1.6693905, 10e-4);
+        var result = DifferentialEquations.rungeKuttaOrder4(f, 0, 3, 1, 10);
+        (math.subset(result.Y, math.index(10))).should.be.approximately(1.6694, 10e-4);
+    });
+
+    // Test case obtaines from Pag 502, chap 9.
+    it('Runge-Kutta order 2', function() {
+        var f = math.eval("f(t, y) = divide(subtract(t, y), 2)");
+        var result = DifferentialEquations.rungeKuttaOrder2(f, 0, 3, 1, 10);
+        (math.subset(result.Y, math.index(10))).should.be.approximately(1.6694, 10e-2);
     });
 
 });
