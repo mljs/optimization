@@ -36,7 +36,7 @@ describe('Optimization', function () {
             return math.multiply(-1, result);
         };
 
-        var result = Optimization.gradientDescent(f, g, p0, 10000, 10e-5, 10e-5);
+        var result = Optimization.gradientDescent(f, g, p0, 100, 10e-5, 10e-5);
 
         var optimumVector = [3.1126511, 1.99983839];
 

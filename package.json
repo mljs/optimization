@@ -8,7 +8,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --require should"
+    "test": "mocha --require should --reporter mocha-better-spec-reporter --recursive",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",
@@ -34,7 +35,17 @@
     "mathjs": "latest"
   },
   "devDependencies": {
+    "browserify": "^8.1.3",
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "gulp-header": "^1.2.2",
+    "gulp-rename": "^1.2.0",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-uglify": "^1.1.0",
     "mocha": "latest",
-    "should": "latest"
+    "mocha-better-spec-reporter": "latest",
+    "should": "latest",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.0.0"
   }
 }
