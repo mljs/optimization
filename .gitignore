@@ -1,3 +1,9 @@
 .idea
 node_modules
 .DS_Store
+.npmignore
+
+dist/optimization.js
+dist/optimization.min.js
+
+dist/optimization.min.js.map

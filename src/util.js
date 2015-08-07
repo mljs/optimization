@@ -3,7 +3,7 @@ var math = require("mathjs");
 Util = {
 
     /*
-     * Function that given a column vector and the maximum of that vector,
+     * Function that given a row vector and the maximum of that vector,
      * returns the index where is it, if there are more of two maximum,
      * it returns the first index found.
      *
@@ -21,6 +21,5 @@ Util = {
             }
         }
     }
-
 
 };
