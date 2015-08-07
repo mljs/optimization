@@ -31,7 +31,8 @@
   },
   "homepage": "https://github.com/mljs/optimization",
   "dependencies": {
-    "mathjs": "latest"
+    "mathjs": "latest",
+    "numeric":"latest"
   },
   "devDependencies": {
     "mocha": "latest",
