@@ -5,5 +5,4 @@ node_modules
 
 dist/optimization.js
 dist/optimization.min.js
-
 dist/optimization.min.js.map
