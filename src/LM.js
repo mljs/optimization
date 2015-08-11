@@ -5,6 +5,7 @@
 var math = require("mathjs");
 var numeric = require('numeric');
 math.import(numeric, {wrap: true, silent: true});
+
 var DEBUG = false;
 /** Levenberg Marquardt curve-fitting: minimize sum of weighted squared residuals
  ----------  INPUT  VARIABLES  -----------
@@ -60,6 +61,10 @@ var DEBUG = false;
    http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
  */
 var LM = {
+    optimize: function(func,t,t_dat,weight){
+
+    },
+
     optimize: function(func,p,t,y_dat,weight,dp,p_min,p_max,c,opts){
 
         var tensor_parameter = 0;			// set to 1 of parameter is a tensor
@@ -87,8 +92,6 @@ var LM = {
         for(var  i=0;i<Npnt;i++){
             J[i] = new Array(Npar);
         }*/
-
-
 
         if (t.length != y_dat.length) {
             console.log('lm.m error: the length of t must equal the length of y_dat');
@@ -148,6 +151,7 @@ var LM = {
         var stop = false;				// termination flag
 
         var weight_sq = null;
+        //console.log(weight);
         if ( !weight.length || weight.length < Npnt )	{
             // squared weighting vector
             //weight_sq = ( weight(1)*ones(Npnt,1) ).^2;
@@ -161,9 +165,11 @@ var LM = {
 
 
         // initialize Jacobian with finite difference calculation
+        //console.log("J "+weight_sq);
         var result = this.lm_matx(func,t,p_old,y_old,1,J,p,y_dat,weight_sq,dp,c);
         var JtWJ = result.JtWJ,JtWdy=result.JtWdy,X2=result.Chi_sq,y_hat=result.y_hat,J=result.J;
         //[JtWJ,JtWdy,X2,y_hat,J] = this.lm_matx(func,t,p_old,y_old,1,J,p,y_dat,weight_sq,dp,c);
+    //console.log(JtWJ);
 
         if ( Math.max(Math.abs(JtWdy)) < epsilon_1 ){
             console.log(' *** Your Initial Guess is Extremely Close to Optimal ***')
@@ -187,7 +193,6 @@ var LM = {
         var h = null;
         while ( !stop && iteration <= MaxIter ) {		// --- Main Loop
             iteration = iteration + 1;
-
             // incremental change in parameters
             switch(Update_Type){
                 case 1:					// Marquardt
@@ -200,9 +205,11 @@ var LM = {
 
                     h = math.solve(math.add(JtWJ,math.multiply(lambda,math.eye(Npar))),JtWdy);
             }
+
             for(var k=0;k< h.length;k++){
                 h[k]=[h[k]];
             }
+            //console.log("h "+h);
             //h=math.matrix(h);
             //  big = max(abs(h./p)) > 2;
             //this is a big step

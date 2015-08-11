@@ -24,7 +24,7 @@ var lm_func = function(t,p,c){
 // *** adding random errors to the curve-fit equation.
 var example_number = 1;			  // which example to run.
 
-var consts = [ ];                         // optional vector of constants
+var consts = [ ];   // optional vector of constants
 
 var Npnt = 100;				  // number of data points
 
