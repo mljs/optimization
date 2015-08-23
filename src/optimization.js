@@ -33,7 +33,7 @@ Optimization = {
     * @return {Object} result - return an object that contains a minimum vector (.vector) of the function and the evaluation of the function in this vector (.eval).
     *
     * */
-    nelderMead : function (f, vertices, minimumIterations, maximumIterations, epsilon) {
+    This : function (f, vertices, minimumIterations, maximumIterations, epsilon) {
         var size = math.subset(math.size(vertices), math.index(1));
         var y = [];
         for(var i = 0; i < size + 1; ++i) {
