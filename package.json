@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/mljs/optimization",
   "dependencies": {
+    "ml-matrix":"../matrix",
     "mathjs": "latest",
     "numeric":"latest"
   },

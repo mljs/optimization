@@ -1,44 +1,42 @@
 /**
  * Created by acastillo on 8/5/15.
  */
-
-var math = require("mathjs");
-var numeric = require('numeric');
-math.import(numeric, {wrap: true, silent: true});
+var Matrix = require("ml-matrix");
+var math = Matrix.algebra;
 
 var DEBUG = false;
 /** Levenberg Marquardt curve-fitting: minimize sum of weighted squared residuals
  ----------  INPUT  VARIABLES  -----------
  func   = function of n independent variables, 't', and m parameters, 'p',
-          returning the simulated model: y_hat = func(t,p,c)
+ returning the simulated model: y_hat = func(t,p,c)
  p      = n-vector of initial guess of parameter values
  t      = m-vectors or matrix of independent variables (used as arg to func)
  y_dat  = m-vectors or matrix of data to be fit by func(t,p)
  weight = weighting vector for least squares fit ( weight >= 0 ) ...
-          inverse of the standard measurement errors
-          Default:  sqrt(d.o.f. / ( y_dat' * y_dat ))
+ inverse of the standard measurement errors
+ Default:  sqrt(d.o.f. / ( y_dat' * y_dat ))
  dp     = fractional increment of 'p' for numerical derivatives
-          dp(j)>0 central differences calculated
-          dp(j)<0 one sided 'backwards' differences calculated
-          dp(j)=0 sets corresponding partials to zero; i.e. holds p(j) fixed
-          Default:  0.001;
+ dp(j)>0 central differences calculated
+ dp(j)<0 one sided 'backwards' differences calculated
+ dp(j)=0 sets corresponding partials to zero; i.e. holds p(j) fixed
+ Default:  0.001;
  p_min  = n-vector of lower bounds for parameter values
  p_max  = n-vector of upper bounds for parameter values
  c      = an optional matrix of values passed to func(t,p,c)
  opts   = vector of algorithmic parameters
-             parameter    defaults    meaning
+ parameter    defaults    meaning
  opts(1)  =  prnt            3        >1 intermediate results; >2 plots
  opts(2)  =  MaxIter      10*Npar     maximum number of iterations
  opts(3)  =  epsilon_1       1e-3     convergence tolerance for gradient
-                                                                  opts(4)  =  epsilon_2       1e-3     convergence tolerance for parameters
-                                                                                                                                   opts(5)  =  epsilon_3       1e-3     convergence tolerance for Chi-square
+ opts(4)  =  epsilon_2       1e-3     convergence tolerance for parameters
+ opts(5)  =  epsilon_3       1e-3     convergence tolerance for Chi-square
  opts(6)  =  epsilon_4       1e-2     determines acceptance of a L-M step
  opts(7)  =  lambda_0        1e-2     initial value of L-M paramter
  opts(8)  =  lambda_UP_fac   11       factor for increasing lambda
  opts(9)  =  lambda_DN_fac    9       factor for decreasing lambda
  opts(10) =  Update_Type      1       1: Levenberg-Marquardt lambda update
-                                      2: Quadratic update
-                                      3: Nielsen's lambda update equations
+ 2: Quadratic update
+ 3: Nielsen's lambda update equations
 
  ----------  OUTPUT  VARIABLES  -----------
  p       = least-squares optimal estimate of the parameter values
@@ -49,21 +47,18 @@ var DEBUG = false;
  R_sq    = R-squared cofficient of multiple determination
  cvg_hst = convergence history
 
-   Henri Gavin, Dept. Civil & Environ. Engineering, Duke Univ. 22 Sep 2013
-   modified from: http://octave.sourceforge.net/optim/function/leasqr.html
-       using references by
-   Press, et al., Numerical Recipes, Cambridge Univ. Press, 1992, Chapter 15.
-   Sam Roweis       http://www.cs.toronto.edu/~roweis/notes/lm.pdf
-       Manolis Lourakis http://www.ics.forth.gr/~lourakis/levmar/levmar.pdf
-       Hans Nielson     http://www2.imm.dtu.dk/~hbn/publ/TR9905.ps
-       Mathworks        optimization toolbox reference manual
-   K. Madsen, H.B., Nielsen, and O. Tingleff
-   http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
+ Henri Gavin, Dept. Civil & Environ. Engineering, Duke Univ. 22 Sep 2013
+ modified from: http://octave.sourceforge.net/optim/function/leasqr.html
+ using references by
+ Press, et al., Numerical Recipes, Cambridge Univ. Press, 1992, Chapter 15.
+ Sam Roweis       http://www.cs.toronto.edu/~roweis/notes/lm.pdf
+ Manolis Lourakis http://www.ics.forth.gr/~lourakis/levmar/levmar.pdf
+ Hans Nielson     http://www2.imm.dtu.dk/~hbn/publ/TR9905.ps
+ Mathworks        optimization toolbox reference manual
+ K. Madsen, H.B., Nielsen, and O. Tingleff
+ http://www2.imm.dtu.dk/pubdb/views/edoc_download.php/3215/pdf/imm3215.pdf
  */
 var LM = {
-    optimize: function(func,t,t_dat,weight){
-
-    },
 
     optimize: function(func,p,t,y_dat,weight,dp,p_min,p_max,c,opts){
 
@@ -83,15 +78,15 @@ var LM = {
         var eps = 2^-52;
         var Npar   = p.length;//length(p); 			// number of parameters
         var Npnt   = y_dat.length;//length(y_dat);		// number of data points
-        var p_old  = math.zeros(Npar,1);		// previous set of parameters
-        var y_old  = math.zeros(Npnt,1);		// previous model, y_old = y_hat(t;p_old)
+        var p_old  = new Matrix.zeros(Npar,1);		// previous set of parameters
+        var y_old  = new Matrix.zeros(Npnt,1);		// previous model, y_old = y_hat(t;p_old)
         var X2     = 1e-2/eps;			// a really big initial Chi-sq value
         var X2_old = 1e-2/eps;			// a really big initial Chi-sq value
-        var J = math.zeros(Npnt,Npar);
+        var J = new Matrix.zeros(Npnt,Npar);
         /*var J      = new Array(Npnt);//zeros(Npnt,Npar);		// Jacobian matrix
-        for(var  i=0;i<Npnt;i++){
-            J[i] = new Array(Npar);
-        }*/
+         for(var  i=0;i<Npnt;i++){
+         J[i] = new Array(Npar);
+         }*/
 
         if (t.length != y_dat.length) {
             console.log('lm.m error: the length of t must equal the length of y_dat');
@@ -155,7 +150,8 @@ var LM = {
         if ( !weight.length || weight.length < Npnt )	{
             // squared weighting vector
             //weight_sq = ( weight(1)*ones(Npnt,1) ).^2;
-            var tmp = math.multiply(math.ones(Npnt,1),weight[0]);
+            //console.log("weight[0] "+typeof weight[0]);
+            var tmp = math.multiply(new Matrix.ones(Npnt,1),weight[0]);
             weight_sq = math.dotMultiply(tmp,tmp);
         }
         else{
@@ -169,7 +165,7 @@ var LM = {
         var result = this.lm_matx(func,t,p_old,y_old,1,J,p,y_dat,weight_sq,dp,c);
         var JtWJ = result.JtWJ,JtWdy=result.JtWdy,X2=result.Chi_sq,y_hat=result.y_hat,J=result.J;
         //[JtWJ,JtWdy,X2,y_hat,J] = this.lm_matx(func,t,p_old,y_old,1,J,p,y_dat,weight_sq,dp,c);
-    //console.log(JtWJ);
+        //console.log(JtWJ);
 
         if ( Math.max(Math.abs(JtWdy)) < epsilon_1 ){
             console.log(' *** Your Initial Guess is Extremely Close to Optimal ***')
@@ -189,7 +185,7 @@ var LM = {
         //console.log(X2);
         X2_old = X2; // previous value of X2
         //console.log(MaxIter+" "+Npar);
-        var cvg_hst = math.ones(MaxIter,Npar+3);		// initialize convergence history
+        var cvg_hst = new Matrix.ones(MaxIter,Npar+3);		// initialize convergence history
         var h = null;
         while ( !stop && iteration <= MaxIter ) {		// --- Main Loop
             iteration = iteration + 1;
@@ -198,17 +194,17 @@ var LM = {
                 case 1:					// Marquardt
                     //h = ( JtWJ + lambda * math.diag(math.diag(JtWJ)) ) \ JtWdy;
                     //h = math.multiply(math.inv(JtWdy),math.add(JtWJ,math.multiply(lambda,math.diag(math.diag(Npar)))));
-                    h = math.solve(math.add(JtWJ,math.multiply(lambda,math.diag(math.diag(JtWJ)))),JtWdy);
+                    h = math.solve(math.add(JtWJ,math.multiply(math.diag(math.diag(JtWJ)),lambda)),JtWdy);
                     break;
                 default:					// Quadratic and Nielsen
                     //h = ( JtWJ + lambda * math.eye(Npar) ) \ JtWdy;
 
-                    h = math.solve(math.add(JtWJ,math.multiply(lambda,math.eye(Npar))),JtWdy);
+                    h = math.solve(math.add(JtWJ,math.multiply(new Matrix.eye(Npar),lambda)),JtWdy);
             }
 
-            for(var k=0;k< h.length;k++){
+            /*for(var k=0;k< h.length;k++){
                 h[k]=[h[k]];
-            }
+            }*/
             //console.log("h "+h);
             //h=math.matrix(h);
             //  big = max(abs(h./p)) > 2;
@@ -219,15 +215,16 @@ var LM = {
                 hidx[k]=h[idx[k]];
             }
             var p_try = math.add(p, hidx);// update the [idx] elements
-            //console.log(p_try);
+
             for(var k=0;k<p_try.length;k++){
                 p_try[k][0]=Math.min(Math.max(p_min[k][0],p_try[k][0]),p_max[k][0]);
             }
-           // p_try = Math.min(Math.max(p_min,p_try),p_max);           // apply constraints
+            // p_try = Math.min(Math.max(p_min,p_try),p_max);           // apply constraints
 
             var delta_y = math.subtract(y_dat, func(t,p_try,c));       // residual error using p_try
             //func_calls = func_calls + 1;
             //X2_try = delta_y' * ( delta_y .* weight_sq );  // Chi-squared error criteria
+
             var X2_try = math.multiply(math.transpose(delta_y),math.dotMultiply(delta_y,weight_sq));
 
             if ( Update_Type == 2 ){  			  // Quadratic
@@ -251,13 +248,11 @@ var LM = {
             }
 
             //rho = (X2 - X2_try) / ( 2*h' * (lambda * h + JtWdy) ); // Nielsen
-            var sub = math.multiply(math.multiply(math.transpose(h),2),math.add(math.multiply(lambda, h),JtWdy));
-
-            //console.log(X2+" X "+X2_try);
-            var rho = math.multiply(math.subtract(X2, X2_try),math.inv(sub));
+            var rho = (X2-X2_try)/math.multiply(math.multiply(math.transpose(h),2),math.add(math.multiply(lambda, h),JtWdy));
             //console.log("rho "+rho);
             if ( rho > epsilon_4 ) {		// it IS significantly better
-                dX2 = math.subtract(X2, X2_old);
+                //console.log("Here");
+                dX2 = X2 - X2_old;
                 X2_old = X2;
                 p_old = p;
                 y_old = y_hat;
@@ -293,7 +288,7 @@ var LM = {
                         lambda = Math.min(lambda * lambda_UP_fac, 1.e7);
                         break;
                     case 2:							// Quadratic
-                        lambda = lambda + math.abs((X2_try - X2) / 2 / alpha);
+                        lambda = lambda + Math.abs((X2_try - X2) / 2 / alpha);
                         break;
                     case 3:						// Nielsen
                         lambda = lambda * nu;
@@ -341,46 +336,49 @@ var LM = {
             }
         }// --- End of Main Loop
 
-         // --- convergence achieved, find covariance and confidence intervals
+        // --- convergence achieved, find covariance and confidence intervals
 
-         // equal weights for paramter error analysis
-        weight_sq = math.multiply(math.multiply(math.transpose(delta_y),delta_y), math.ones(Npnt,1));
+        // equal weights for paramter error analysis
+        weight_sq = math.multiply(math.multiply(math.transpose(delta_y),delta_y), new Matrix.ones(Npnt,1));
 
-        math.map(weight_sq,function(value){
-            return  (Npnt-Nfit+1)/value;
+        //console.log("XX "+(Npnt-Nfit+1));
+        //console.log(delta_y);
+
+        weight_sq.apply(function(i,j){
+            weight_sq[i][j] = (Npnt-Nfit+1)/weight_sq[i][j];
         });
-
+        //console.log(weight_sq);
         result = this.lm_matx(func,t,p_old,y_old,-1,J,p,y_dat,weight_sq,dp,c);
         JtWJ = result.JtWJ,JtWdy=result.JtWdy,X2=result.Chi_sq,y_hat=result.y_hat,J=result.J;
 
         /*if nargout > 2				// standard error of parameters
-                                        covar = inv(JtWJ);
-                                        sigma_p = sqrt(diag(covar));
-                                        end
+         covar = inv(JtWJ);
+         sigma_p = sqrt(diag(covar));
+         end
 
-                                        if nargout > 3				// standard error of the fit
-                                    //  sigma_y = sqrt(diag(J * covar * J'));	// slower version of below
-                                        sigma_y = zeros(Npnt,1);
-                                        for i=1:Npnt
-                                        sigma_y(i) = J(i,:) * covar * J(i,:)';
-                                        end
-                                        sigma_y = sqrt(sigma_y);
-                                        end
+         if nargout > 3				// standard error of the fit
+         //  sigma_y = sqrt(diag(J * covar * J'));	// slower version of below
+         sigma_y = zeros(Npnt,1);
+         for i=1:Npnt
+         sigma_y(i) = J(i,:) * covar * J(i,:)';
+         end
+         sigma_y = sqrt(sigma_y);
+         end
 
-                                        if nargout > 4				// parameter correlation matrix
-                                        corr = covar ./ [sigma_p*sigma_p'];
-                                            end
+         if nargout > 4				// parameter correlation matrix
+         corr = covar ./ [sigma_p*sigma_p'];
+         end
 
-                                        if nargout > 5				// coefficient of multiple determination
-                                        R_sq = corrcoef([y_dat y_hat]);
-                                        R_sq = R_sq(1,2).^2;
-                                        end
+         if nargout > 5				// coefficient of multiple determination
+         R_sq = corrcoef([y_dat y_hat]);
+         R_sq = R_sq(1,2).^2;
+         end
 
-                                        if nargout > 6				// convergence history
-                                        cvg_hst = cvg_hst(1:iteration,:);
-                                        end*/
+         if nargout > 6				// convergence history
+         cvg_hst = cvg_hst(1:iteration,:);
+         end*/
 
-                                        // endfunction  # ---------------------------------------------------------- LM
+        // endfunction  # ---------------------------------------------------------- LM
 
         return p;
     },
@@ -413,17 +411,16 @@ var LM = {
         var m = y.length;			// number of data points
         var n = p.length;			// number of parameters
 
-        dp = dp || math.multiply(math.ones(1, n), 0.001);
+        dp = dp || math.multiply(new Matrix.ones(1, n), 0.001);
 
-        var ps = JSON.parse(JSON.stringify(p));
+        var ps = p.clone();//JSON.parse(JSON.stringify(p));
         //var ps = $.extend(true, [], p);
-        var J = new Array(m), del =new Array(n);         // initialize Jacobian to Zero
-        for(var k=0;k<m;k++)
-            J[k]=new Array(n);
+        var J = new Matrix(m,n), del =new Array(n);         // initialize Jacobian to Zero
+
         for (var j = 0;j < n; j++) {
             //console.log(j+" "+dp[j]+" "+p[j]+" "+ps[j]+" "+del[j]);
-            del[j] = math.multiply(dp[j], math.add(1, math.abs(p[j])));  // parameter perturbation
-            p[j] = math.add(ps[j], del[j]);	      // perturb parameter p(j)
+            del[j] = dp[j]*(1+Math.abs(p[j][0]));  // parameter perturbation
+            p[j] = [ps[j][0]+del[j]];	      // perturb parameter p(j)
             //console.log(j+" "+dp[j]+" "+p[j]+" "+ps[j]+" "+del[j]);
 
             if (del[j] != 0){
@@ -434,14 +431,13 @@ var LM = {
                     //console.log(del[j]);
                     //console.log(y);
                     var column = math.dotDivide(math.subtract(y1, y),del[j]);
-
                     for(var k=0;k< m;k++){
                         J[k][j]=column[k][0];
                     }
                     //console.log(column);
                 }
                 else{
-                    p[j] = ps[j] - del[j];
+                    p[j][0] = ps[j][0] - del[j];
                     //J(:,j) = (y1 - feval(func, t, p, c)). / (2. * del[j]);
                     var column = math.dotDivide(math.subtract(y1,func(t,p,c)),2*del[j]);
                     for(var k=0;k< m;k++){
@@ -476,12 +472,11 @@ var LM = {
 
         //console.log("hhh "+h);
         var h_t = math.transpose(h);
-        var hh = math.multiply(h_t,h);
-        var hhh = math.map(h_t,function(value){
-            return value / hh;
-        });
+        h_t.div(math.multiply(h_t,h));
+
+        //console.log(h_t);
         //J = J + ( y - y_old - J*h )*h' / (h'*h);	// Broyden rank-1 update eq'n
-        J = math.add(J, math.multiply(math.subtract(y, math.add(y_old,math.multiply(J,h))),hhh));
+        J = math.add(J, math.multiply(math.subtract(y, math.add(y_old,math.multiply(J,h))),h_t));
         return J;
         // endfunction # ---------------------------------------------- LM_Broyden_J
     },
@@ -528,13 +523,12 @@ var LM = {
         dp = dp || 0.001;
 
 
-        var JtWJ = math.zeros(Npar);
-        var JtWdy  = math.zeros(Npar,1);
+        //var JtWJ = new Matrix.zeros(Npar);
+        //var JtWdy  = new Matrix.zeros(Npar,1);
 
         var y_hat = func(t,p,c);	// evaluate model using parameters 'p'
-        //console.log(p);
         //func_calls = func_calls + 1;
-        var J;
+        //console.log(J);
         if ( (iteration%(2*Npar))==0 || dX2 > 0 ) {
             //console.log("Par");
             J = this.lm_FD_J(func, t, p, y_hat, dp, c);		// finite difference
@@ -543,20 +537,20 @@ var LM = {
             //console.log("ImPar");
             J = this.lm_Broyden_J(p_old, y_old, J, p, y_hat); // rank-1 update
         }
-        //console.log("J "+J);
         var delta_y = math.subtract(y_dat, y_hat);	// residual error between model and data
         //console.log(delta_y[0][0]);
-        //console.log(weight_sq);
+        //console.log(delta_y.rows+" "+delta_y.columns+" "+JSON.stringify(weight_sq));
         //var Chi_sq = delta_y' * ( delta_y .* weight_sq ); 	// Chi-squared error criteria
         var Chi_sq = math.multiply(math.transpose(delta_y),math.dotMultiply(delta_y,weight_sq));
         //JtWJ  = J' * ( J .* ( weight_sq * ones(1,Npar) ) );
         var Jt = math.transpose(J);
-        //console.log("J "+J);
+
         //console.log(weight_sq);
-        var JtWJ = math.multiply(Jt,math.dotMultiply(J,math.multiply(weight_sq,math.ones(1,Npar))));
-        //console.log(math.multiply(weight_sq,math.ones(1,Npar)));
+
+        var JtWJ = math.multiply(Jt, math.dotMultiply(J,math.multiply(weight_sq,new Matrix.ones(1,Npar))));
+
         //JtWdy = J' * ( weight_sq .* delta_y );
-        var JtWdy = math.multiply(Jt,math.dotMultiply(weight_sq,delta_y));
+        var JtWdy = math.multiply(Jt, math.dotMultiply(weight_sq,delta_y));
 
 
         return {JtWJ:JtWJ,JtWdy:JtWdy,Chi_sq:Chi_sq,y_hat:y_hat,J:J};

@@ -1,9 +1,10 @@
 /**
  * Created by acastillo on 8/10/15.
  */
-var math = require("mathjs");
+//var math = require("mathjs");
 var Matrix = require("ml-matrix");
-var LM = require("../src/LM");
+var math = Matrix.algebra;
+var LM = require("../src/LM2");
 
 //Lorentzian function
 //p is a column where p[0][0] is the center of the distribution, and p[1][0] is the parameter specifying the width.
@@ -38,7 +39,7 @@ for(var i=0;i<nbPoints;i++){
     y_data[i][0]/=maxY
 }
 console.log(nbPoints);
-var weight = [nbPoints / math.sqrt(math.multiply(math.transpose(y_data),y_data))];
+var weight = [nbPoints / math.sqrt(y_data.dot(y_data))];
 console.log("weight: "+weight);
 var opts = [  3,    100, 1e-3, 1e-3, 1e-3, 1e-2, 1e-2,    11,    9,        1 ];
 var consts = [ ];                         // optional vector of constants
