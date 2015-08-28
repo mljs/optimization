@@ -6,7 +6,7 @@ var Matrix = require("ml-matrix");
 var math = Matrix.algebra;
 var LM = require("../src/LM2");
 
-//Lorentzian function
+//Lorentzian function *
 //p is a column where p[0][0] is the center of the distribution, and p[1][0] is the parameter specifying the width.
 var lm_func = function(t,p,c){
     var factor = p[2][0]*Math.pow(p[1][0],2);
