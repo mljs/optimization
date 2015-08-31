@@ -15,6 +15,7 @@ describe('Optimization', function () {
         var result = Optimization.nelderMead(f, vertices, 33, 35, 10e-4);
 
         var optimumVector = [2.99996456, 1.99983839];
+        //var i=0;
 
         for(var i = 0; i < vertices[0].length; ++i) {
             (math.subset(result.vector, math.index(i))).should.be.approximately(optimumVector[i], 10e-4);
