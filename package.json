@@ -25,7 +25,11 @@
     "machine",
     "learning"
   ],
-  "author": "Jefferson Hernández and Andrés Castillo",
+  "author": "Andrés Castillo",
+  "contributors": [
+    "Jefferson Hernández",
+    "Michaël Zasso"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mljs/optimization/issues"
