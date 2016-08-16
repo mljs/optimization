@@ -38,9 +38,9 @@
   },
   "homepage": "https://github.com/mljs/optimization",
   "dependencies": {
-    "ml-matrix": "../matrix",
-    "mathjs": "latest",
-    "numeric": "latest"
+    "mathjs": "^3.4.1",
+    "ml-matrix": "^2.0.0",
+    "numeric": "^1.2.6"
   },
   "devDependencies": {
     "mocha": "^3.0.2",
