@@ -1,5 +1,5 @@
 {
-  "name": "optimization",
+  "name": "ml-optimization",
   "version": "0.0.1",
   "description": "Optimization methods library",
   "main": "src/index.js",
